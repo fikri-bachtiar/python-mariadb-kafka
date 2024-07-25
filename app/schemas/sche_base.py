@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Any
 from app.helpers.enums import ResponseError
 
-class ResponseSchemaBase(BaseModel):
+class DataResponse(BaseModel):
     __abstract__ = True
 
     error: ResponseError = ResponseError.NO_ERROR
