@@ -3,9 +3,17 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.routers import books
+
+from app.crud import books as books_crud
+from app.models import books as books_model
+from app.schemas import books as books_schemas
+from app.db.base import SessionLocal, engine
+
+books_model.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=settings.app_project_name,
               description='Base frame with FastAPI micro framework + MariaDB + Kafka',
