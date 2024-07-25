@@ -1,25 +1,29 @@
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
+# from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
-from sqlalchemy.orm import Session
+# from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.routers import books
+from app.routers import api_books
 
-from app.crud import books as books_crud
-from app.models import books as books_model
-from app.schemas import books as books_schemas
-from app.db.base import SessionLocal, engine
+# from app.crud import crud_books as books_crud
+# from app.models import model_books as books_model
+# from app.schemas import sche_books as books_schemas
+# from app.db.base import SessionLocal, engine
 
-books_model.Base.metadata.create_all(bind=engine)
+# books_model.Base.metadata.create_all(bind=engine)
+
+from fastapi_sqlalchemy import DBSessionMiddleware
+# from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI(title=settings.app_project_name,
               description='Base frame with FastAPI micro framework + MariaDB + Kafka',
               version=settings.app_project_version)
 
-app.include_router(books.router)
+app.add_middleware(DBSessionMiddleware, db_url=settings.app_database_url)
+app.include_router(api_books.router)
 
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
