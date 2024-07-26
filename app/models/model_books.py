@@ -7,6 +7,6 @@ class Book(Base):
     __tablename__ = "books"
 
     id = Column(Integer, primary_key=True)
-    title = Column(String, index=True)
-    author = Column(String, index=True)
-    category = Column(String, index=True)
+    title = Column(String(100), index=True)
+    author = Column(String(100), index=True)
+    category = Column(String(100), index=True)

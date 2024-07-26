@@ -8,7 +8,11 @@ class Settings(BaseSettings):
     app_project_version: str = "v1.0.0"
     app_running_host: str = "127.0.0.1"
     app_running_port: int = 8000
-    app_database_url: str = "sqlite:///./sql_app.db"
+    app_maria_db_host: str = "127.0.0.1"
+    app_maria_db_port: int = 3306
+    app_maria_db_name: str = "example_database"
+    app_maria_db_username: str = "example_user"
+    app_maria_db_password: str = "example_password"
 
     model_config = SettingsConfigDict(env_file=os.path.join(BASE_DIR, '.env'))
 

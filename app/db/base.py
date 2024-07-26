@@ -2,13 +2,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
-# SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-# SQLALCHEMY_DATABASE_URL = "mariadb+mariadbconnector://example-user:my_cool_secret@127.0.0.1:3306/exmple-database"
+from app.config import settings
+
+SQLALCHEMY_DATABASE_URL = "mariadb+mariadbconnector://{}:{}@{}:{}/{}".format(settings.app_maria_db_username, 
+                                                                             settings.app_maria_db_password,
+                                                                             settings.app_maria_db_host,
+                                                                             settings.app_maria_db_port,
+                                                                             settings.app_maria_db_name)
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False}
+    # connect_args={"check_same_thread": False}
 )
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

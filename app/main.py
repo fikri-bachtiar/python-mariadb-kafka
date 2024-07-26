@@ -22,7 +22,7 @@ app = FastAPI(title=settings.app_project_name,
               description='Base frame with FastAPI micro framework + MariaDB + Kafka',
               version=settings.app_project_version)
 
-# app.add_middleware(DBSessionMiddleware, db_url=settings.app_database_url)
+# app.add_middleware(DBSessionMiddleware, db_url=settings.app_db_url)
 app.include_router(api_books.router)
 
 @app.exception_handler(StarletteHTTPException)
