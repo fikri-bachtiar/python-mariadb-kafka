@@ -12,10 +12,7 @@ from app.crud import crud_books
 from app.schemas import sche_books
 
 # import kafka producer
-# from app.external import kafka_prod
-
-from kafka import KafkaProducer
-producer = KafkaProducer(bootstrap_servers="127.0.0.1:29092")
+from app.external import kafka_prod
 
 router = APIRouter(prefix="/books", tags=["books"])
 
@@ -37,8 +34,8 @@ async def create_new_book(
             )
         crud_books.create_new_book(db, new_book)
         # write to kafka topic
-        producer.send("post-create_book", value=new_book.model_dump_json().encode())
-        producer.flush()
+        kafka_prod.producer.send("post-create_book", value=new_book.model_dump_json().encode())
+        kafka_prod.producer.flush()
 
         return DataResponse().response(
             error=ResponseError.NO_ERROR, message="book added successfully"
@@ -97,8 +94,8 @@ async def update_existing_book(
             book_title_conv = sche_books.Book.model_validate(book_title)
             crud_books.update_existing_book(db, book_title_conv.title, update_book)
             # write to kafka topic
-            producer.send("put-update_book", value=update_book.model_dump_json().encode())
-            producer.flush()
+            kafka_prod.producer.send("put-update_book", value=update_book.model_dump_json().encode())
+            kafka_prod.producer.flush()
             return DataResponse().response(
                 error=ResponseError.NO_ERROR, message="book updated successfully"
             )
@@ -122,8 +119,8 @@ async def delete_existing_book(
             ret_book_title_conv = sche_books.Book.model_validate(ret_book_title)
             crud_books.delete_existing_book(db, ret_book_title_conv.title)
             # write to kafka topic
-            producer.send("delete-delete_book", value=book_title.encode())
-            producer.flush()
+            kafka_prod.producer.send("delete-delete_book", value=book_title.encode())
+            kafka_prod.producer.flush()
             return DataResponse().response(
                 error=ResponseError.NO_ERROR, message="book deleted successfully"
             )
