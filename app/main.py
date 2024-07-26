@@ -1,20 +1,17 @@
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-
 # from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-# from sqlalchemy.orm import Session
-
 from app.config import settings
-from app.routers import api_books
-
+# from app.schemas import sche_books as books_schemas
+from app.db.base import engine
 # from app.crud import crud_books as books_crud
 from app.models import model_books as books_model
+from app.routers import api_books
 
-# from app.schemas import sche_books as books_schemas
-from app.db.base import SessionLocal, engine
+# from sqlalchemy.orm import Session
 
 books_model.Base.metadata.create_all(bind=engine)
 
@@ -45,4 +42,4 @@ async def custom_http_exception_handler(request: Request, exc: StarletteHTTPExce
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=settings.app_running_host, port=settings.app_running_port)
+    uvicorn.run("main:app", host=settings.app_running_host, port=settings.app_running_port)

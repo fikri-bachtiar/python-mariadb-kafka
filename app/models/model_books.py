@@ -1,8 +1,8 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-
-# from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String
 
 from app.db.base import Base
+
+# from sqlalchemy.orm import relationship
 
 
 class Book(Base):
