@@ -1,22 +1,26 @@
+from contextlib import asynccontextmanager
+
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-# from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.config import settings
-# from app.schemas import sche_books as books_schemas
-from app.db.base import engine
-# from app.crud import crud_books as books_crud
-from app.models import model_books as books_model
+from app.db.base import sessionmanager
 from app.routers import api_books
 
-# from sqlalchemy.orm import Session
 
-books_model.Base.metadata.create_all(bind=engine)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Function that handles startup and shutdown events.
+    To understand more, read https://fastapi.tiangolo.com/advanced/events/
+    """
+    yield
+    if sessionmanager._engine is not None:
+        # Close the DB connection
+        await sessionmanager.close()
 
-# from fastapi_sqlalchemy import DBSessionMiddleware
-# from starlette.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title=settings.app_project_name,

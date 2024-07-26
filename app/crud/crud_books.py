@@ -1,45 +1,48 @@
-# from fastapi import Depends
-from sqlalchemy import Column, String
-from sqlalchemy.orm import Session
+from sqlalchemy import delete, update
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
 from app.models import model_books
 from app.schemas import sche_books
 
 
-def get_all_book(db: Session):
-    return db.query(model_books.Book).all()
+async def get_all_book(db: AsyncSession):
+    result = await db.execute(select(model_books.Book))
+    return result.scalars().all()
 
 
-def get_book_by_category(db: Session, category: str):
-    return db.query(model_books.Book).filter(model_books.Book.category == category).all()
+async def get_book_by_category(db: AsyncSession, category: str):
+    result = await db.execute(select(model_books.Book).where(model_books.Book.category == category))
+    return result.scalars().all()
 
 
-def get_book_by_title(db: Session, title: str):
-    return db.query(model_books.Book).filter(model_books.Book.title == title).first()
+async def get_book_by_title(db: AsyncSession, title: str):
+    result = await db.execute(select(model_books.Book).where(model_books.Book.title == title))
+    return result.scalars().all()
 
 
-def create_new_book(db: Session, book: sche_books.BookCreate):
-    db_book = model_books.Book(title=book.title, author=book.author, category=book.category)
-    db.add(db_book)
-    db.commit()
-    db.refresh(db_book)
-    return db_book
+async def create_new_book(db: AsyncSession, book: sche_books.BookCreate):
+    new_book = model_books.Book(**book.model_dump())
+    db.add(new_book)
+    await db.commit()
+    return new_book
 
 
-def update_existing_book(db: Session, title: str, book: sche_books.BookCreate):
-    db_book = db.query(model_books.Book).filter(model_books.Book.title == title).first()
-    if db_book:
-        db_book.title = Column(book.title, String)
-        db_book.author = Column(book.author, String)
-        db_book.category = Column(book.category, String)
-        db.commit()
-        db.refresh(db_book)
-    return db_book
+async def update_existing_book(db: AsyncSession, title: str, book: sche_books.BookCreate):
+    result = await db.execute(
+        update(model_books.Book)
+        .where(model_books.Book.title == title)
+        .values(**book.model_dump())
+        # .returning(model_books.Book)
+    )
+    await db.commit()
+    return result.rowcount
 
 
-def delete_existing_book(db: Session, title: str):
-    db_book = db.query(model_books.Book).filter(model_books.Book.title == title).first()
-    if db_book:
-        db.delete(db_book)
-        db.commit()
-    return db_book
+async def delete_existing_book(db: AsyncSession, title: str):
+    result = await db.execute(
+        delete(model_books.Book).where(model_books.Book.title == title)
+        # .returning(model_books.Book)
+    )
+    await db.commit()
+    return result.rowcount

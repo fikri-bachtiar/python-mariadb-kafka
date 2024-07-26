@@ -11,7 +11,7 @@ class DataResponse(BaseModel):
     error: ResponseError = ResponseError.NO_ERROR
     message: Any = ""
 
-    def response(self, error: ResponseError, message: str):
+    def response(self, error: ResponseError, message: Any):
         self.error = error
         self.message = message
         return self
