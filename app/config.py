@@ -1,7 +1,8 @@
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+
 
 class Settings(BaseSettings):
     app_project_name: str = "fastapi-mariadb-kafka"
@@ -14,6 +15,7 @@ class Settings(BaseSettings):
     app_maria_db_username: str = "example_user"
     app_maria_db_password: str = "example_password"
 
-    model_config = SettingsConfigDict(env_file=os.path.join(BASE_DIR, '.env'))
+    model_config = SettingsConfigDict(env_file=os.path.join(BASE_DIR, ".env"))
+
 
 settings = Settings()

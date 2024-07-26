@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import Any
 from app.helpers.enums import ResponseError
 
+
 class DataResponse(BaseModel):
     __abstract__ = True
 
@@ -15,10 +16,10 @@ class DataResponse(BaseModel):
 
     def success_response(self):
         self.error = 0
-        self.message = 'success'
+        self.message = "success"
         return self
-    
+
     def failed_response(self):
         self.error = 0
-        self.message = 'failed'
+        self.message = "failed"
         return self
