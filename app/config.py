@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     app_maria_db_name: str = "example_database"
     app_maria_db_username: str = "example_user"
     app_maria_db_password: str = "example_password"
+    app_kafka_broker: str = "127.0.0.1:29092"
 
     model_config = SettingsConfigDict(env_file=os.path.join(BASE_DIR, ".env"))
 

@@ -11,6 +11,12 @@ from app.db.base import get_db
 from app.crud import crud_books
 from app.schemas import sche_books
 
+# import kafka producer
+# from app.external import kafka_prod
+
+from kafka import KafkaProducer
+producer = KafkaProducer(bootstrap_servers="127.0.0.1:29092")
+
 router = APIRouter(prefix="/books", tags=["books"])
 
 # #for the purpose of this illustration, a list instead of a model will be used
@@ -30,10 +36,15 @@ async def create_new_book(
                 error=ResponseError.ERROR, message="book with this title already exists"
             )
         crud_books.create_new_book(db, new_book)
+        # write to kafka topic
+        producer.send("post-create_book", value=new_book.model_dump_json().encode())
+        producer.flush()
+
         return DataResponse().response(
             error=ResponseError.NO_ERROR, message="book added successfully"
         )
     except Exception as e:
+        print(e, str(e))
         response.status_code = status.HTTP_400_BAD_REQUEST
         return DataResponse().response(error=ResponseError.ERROR, message=str(e))
 
@@ -75,7 +86,7 @@ async def read_all_books_with_category(
 
 
 @router.put("/update_book", status_code=status.HTTP_200_OK, response_model=DataResponse)
-async def update_book(
+async def update_existing_book(
     response: Response,
     update_book: sche_books.BookCreate,
     db: Session = Depends(get_db),
@@ -85,6 +96,9 @@ async def update_book(
         if book_title is not None:
             book_title_conv = sche_books.Book.model_validate(book_title)
             crud_books.update_existing_book(db, book_title_conv.title, update_book)
+            # write to kafka topic
+            producer.send("put-update_book", value=update_book.model_dump_json().encode())
+            producer.flush()
             return DataResponse().response(
                 error=ResponseError.NO_ERROR, message="book updated successfully"
             )
@@ -99,7 +113,7 @@ async def update_book(
 @router.delete(
     "/delete_book", status_code=status.HTTP_200_OK, response_model=DataResponse
 )
-async def delete_book(
+async def delete_existing_book(
     response: Response, book_title: str, db: Session = Depends(get_db)
 ):
     try:
@@ -107,6 +121,9 @@ async def delete_book(
         if ret_book_title is not None:
             ret_book_title_conv = sche_books.Book.model_validate(ret_book_title)
             crud_books.delete_existing_book(db, ret_book_title_conv.title)
+            # write to kafka topic
+            producer.send("delete-delete_book", value=book_title.encode())
+            producer.flush()
             return DataResponse().response(
                 error=ResponseError.NO_ERROR, message="book deleted successfully"
             )
