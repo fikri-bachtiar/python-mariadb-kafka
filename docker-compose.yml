@@ -1,0 +1,10 @@
+version: '3.9'
+
+services:
+  pybooklib-mariadb-kafka:
+    build: ./
+    image: "${APP_DEV_INITIAL}_${APP_CONTAINER_NAME}_img:${APP_CONTAINER_VERSION}"
+    container_name: "${APP_CONTAINER_NAME}"
+    restart: always
+    env_file: .env
+    network_mode: host
